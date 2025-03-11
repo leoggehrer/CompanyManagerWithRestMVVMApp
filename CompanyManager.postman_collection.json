@@ -1,0 +1,257 @@
+{
+	"info": {
+		"_postman_id": "534289d9-50e8-413e-bc46-84456bd6d942",
+		"name": "CompanyManager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2180370"
+	},
+	"item": [
+		{
+			"name": "CreateDb",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"Admin\",\r\n    \"password\": \"passme1234!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7074/api/system",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"system"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Companies",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7074/api/companies",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Companies/id",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7074/api/companies/2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddCompany",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"ComNet GmbH\",\r\n    \"address\": \"Austria\",\r\n    \"description\": \"Coole Firma\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7074/api/companies",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EditCompany",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"ComNet GmbH-Update\",\r\n    \"address\": \"Austria\",\r\n    \"description\": \"Coole Firma-Update\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7074/api/companies/18",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies",
+						"18"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteCompany",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7074/api/companies/16",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies",
+						"16"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customers",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7074/api/customers",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Employees",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7074/api/employees",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"employees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PatchCompany",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"op\": \"replace\",\r\n        \"path\": \"address\",\r\n        \"value\": \"USA, Redmond Washington\"\r\n    },\r\n    {\r\n        \"op\": \"replace\",\r\n        \"path\": \"description\",\r\n        \"value\": \"Test-hallo\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7074/api/companies/2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7074",
+					"path": [
+						"api",
+						"companies",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

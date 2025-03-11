@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "RestMVVMAppWithWebApi",
+    "Projects": [
+      {
+        "Path": "CompanyManager.WebApi\\CompanyManager.WebApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "CompanyManager.RestMVVMApp\\CompanyManager.RestMVVMApp.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
