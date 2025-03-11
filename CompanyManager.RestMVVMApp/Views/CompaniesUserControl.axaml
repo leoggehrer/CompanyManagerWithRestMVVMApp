@@ -31,7 +31,7 @@
 				Grid.Column="0"
 				Grid.Row="0"
 				Background="Transparent"
-				Command="{Binding ExecuteAddCommand}"
+				Command="{Binding AddItemCommand}"
 				Margin="0 0 0 10">
 				<StackPanel Orientation="Horizontal" Width="20" Height="20">
 					<Image Source="/Assets/add.png"></Image>
@@ -41,7 +41,7 @@
 			<TextBox 
 				Grid.Column="0" 
 				Grid.Row="0" 
-				ToolTip.Tip="Geben Sie hier eine Filter ein"
+				Watermark="Geben Sie hier eine Filter ein"
 				Text="{Binding Filter}" 
 				HorizontalAlignment="Stretch" 
 				Margin="40 0 0 10" />
@@ -67,6 +67,7 @@
 			BorderBrush="Gray"
 			IsReadOnly="True"
 			ItemsSource="{Binding Companies}"
+			SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
 			AutoGenerateColumns="False">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Name" Binding="{Binding Name}" />
@@ -78,7 +79,7 @@
 							<StackPanel Orientation="Horizontal">
 								<Button
 									Background="Transparent"
-									Command="{Binding #dataGrid.((vm:CompaniesViewModel)DataContext).ExecuteEditItemCommand}"
+									Command="{Binding #dataGrid.((vm:CompaniesViewModel)DataContext).EditItemCommand}"
 									CommandParameter="{Binding}">
 									<StackPanel Orientation="Horizontal" Width="20" Height="20">
 										<Image Stretch="" Source="/Assets/edit.png"></Image>
@@ -86,7 +87,7 @@
 								</Button>
 								<Button
 									Background="Transparent"
-									Command="{Binding #dataGrid.((vm:CompaniesViewModel)DataContext).ExecuteDeleteItemCommand}"
+									Command="{Binding #dataGrid.((vm:CompaniesViewModel)DataContext).DeleteItemCommand}"
 									CommandParameter="{Binding}">
 									<StackPanel Orientation="Horizontal" Width="20" Height="20">
 										<Image Stretch="" Source="/Assets/delete.png"></Image>
