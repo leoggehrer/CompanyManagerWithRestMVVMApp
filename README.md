@@ -1,41 +1,72 @@
-# CompanyManager With Rest Console
+# CompanyManager With Rest Avalonia MVVM Anwendung
 
 **Lernziele:**
 
 - Wie mit dem **HttpClient** REST-Schnittstellen abgefragt werden.
-- Wie mit einer Konsolen-Programm über die REST-API abgefragt und manipuliert werden.
+- Wie mit einer Avalonia MVVM-Anwendung über die REST-API Daten abgefragt und manipuliert werden.
 
-**Hinweis:** Als Startpunkt wird die Vorlage [CompanyManagerWithWebApi](https://github.com/leoggehrer/CompanyManagerWithWebApi) verwendet.
+**Hinweis:** Als Startpunkt wird die Vorlage [CompanyManagerWithRestConApp](https://github.com/leoggehrer/CompanyManagerWithRestConApp/blob/master/README.md) verwendet.
 
 ## Vorbereitung
 
 Bevor mit der Umsetzung begonnen wird, sollte die Vorlage heruntergeladen und die Funktionalität verstanden werden.
 
-### RestConApp-Projekt erstellen
+## Dialog-Konzept
 
-- Erstellen Sie ein neues Projekt vom Typ **Core-Console** und vergeben Sie den Namen **CompanyManager.RestConApp**.
-- Verbinden Sie das Projekt **CompanyManager.RestConApp** mit dem Projekt **CompanyManager.Common**.
+Der Aufbau in dieser Anwendung besteht im Wesentlichen aus einer Übersichtsseite und einzelne Dialoge für die Erstellung, Bearbeitung und das Löschen von Einträgen. In der nachfolgenden Anwendung ist die Übersichtsseite für den `CompanyManager` abgebildet:
 
-### Packages installieren
+![Übersicht-CompanyManager](img/mvvm_overview.png)
 
-- Fügen Sie das Package `System.Linq.Dynamic.Core` hinzu, um Zeichenfolgen (strings) in LINQ-Abfragen zu verwenden. 
-- Fügen Sie das Package `Microsoft.AspNetCore.JsonPatch` 
-- und das Package `Microsoft.AspNetCore.Mvc.NewtonsoftJson`dem Projekt hinzu.
-  
-Das Hinzufügen des Packages erfolgt im Konsolen-Programm und die Anleitung dazu finden Sie [hier](https://github.com/leoggehrer/Slides/tree/main/NugetInstall).
+Als Hauptkomponente wird ein TabControl verwendet. Diese Komponente steuert die Umschaltung zwischen den einzelnen Entitäten **Firma**, **Kunde** und **Mitarbeiter**. Die einzelnen Registerkarten sind mit einem Filter, einer Lade-Aktion und einer Hinzufügen-Aktion ausgestattet. Erfolgt beim Filter eine Eingabe, werden die Einträge entsprechend dem Filterkriterium angezeigt. Die Lade-Aktion lädt die Daten erneut von der REST-API und wendet den Filter auf das Ladeergebnis an. Das Aktivieren der Hinzufüge-Aktion zeigt eine Dialog-Komponente zur Eingabe der Daten für eine Firma an. In unserem Fall sind das die Eigenschaften Name, Adresse und Beschreibung. In der nachfolgenden Abbildung ist das Eingabeformular für die Firma dargestellt:
 
-Initialisieren Sie die `NewtonsoftJson`-Bibliothek mit der folgenden Zeile in der Klasse `Program`.
+![Hinzufügen-CompanyManager](img/mvvm_edit.png)
 
-```csharp
-...
-builder.Services.AddControllers()
-                .AddNewtonsoftJson();   // Add this to the controllers for PATCH-operation.
-...
+Fehlende bzw. Ungültige Eingabe führen zu einer Fehlermeldung. Nachfolgend die Fehler-Anzeige für die Erstellung einer Firma mit gleichem Namen:
+
+![Fehler-Hinzufügen-CompanyManager](img/mvvm_error_add.png)
+
+Fehler können auch bei der Bearbeitung von Einträgen entstehen. So kann durch das Ändern des Namens einer Firma eine Kollision mit einer bereits bestehenden Firma entstehen. In diesem Fall wird ebenfalls eine Fehlermeldung angezeigt. Die Bearbeitung wird durch den Button mit dem "Bearbeiten"-Symbol in der entsprechenden Zeile aktiviert.
+
+Soll ein Eintrag gelöscht werden, dann muss der Button mit dem "Löschen"-Symbol in der entsprechende Zeile ausgewählt werden. Bevor jedoch der Eintrag in gelöscht wird, erfolgt eine Sicherheitsabfrage:
+
+![Abfrage-Löschen-CompanyManager](img/mvvm_delete.png)
+
+Nach Bestätigung der Operation erfolgt die Weiterleitung der Aktion an die REST-API. Durch die Ausführung kann es ebenfalls zu einem Fehler kommen. Z.B. kann mit dem Löschen die **Referentielle Integrität** verletzt werden. In diesem Fall wird ebenfalls eine Fehlermeldung angezeigt:
+
+![Fehler-Löschen-CompanyManager](img/mvvm_error_delete.png)
+
+**Hinweis:** Dieses Dialog-Konzept kann auf die anderen Entitäten ebenfalls übertragen werden.
+
+### Avalonia MVVM-Projekt erstellen
+
+- Erstellen Sie ein neues Projekt vom Typ **Avalonia .NET MVVM App** und vergeben Sie den Namen **CompanyManager.RestMVVMApp**.
+- Verbinden Sie das Projekt **CompanyManager.RestMVVMApp** mit dem Projekt **CompanyManager.Common**.
+
+## Packages installieren
+
+Überprüfen Sie in der Projekt-Datei (`CompanyManager.RestMVVMApp.csproj`) ob alle Packages installiert worden sind.
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="ReactiveUI" Version="20.1.63" />
+  </ItemGroup>
 ```
+  
+Falls Packages fehlen, fügen Sie die fehlenden Packages manuell hinzu. Das Hinzufügen des Packages erfolgt im Konsolen-Programm und die Anleitung dazu finden Sie [hier](https://github.com/leoggehrer/Slides/tree/main/NugetInstall).
 
-### Erstellen der Models
+## Erstellen der Models
 
-Erstellen Sie im Projekt **CompanyManager.WebApi** einen Ordner **Models** und fügen Sie die Klassen **Company**, **Customer** und **Employee** hinzu.
+Erstellen Sie im Projekt **CompanyManager.RestMVVMApp** einen Ordner **Models** und fügen Sie die Klassen **Company**, **Customer** und **Employee** hinzu.
 
 Nachfolgend ein Beispiel für das **Company**-Model:
 
@@ -82,379 +113,166 @@ public abstract class ModelObject : Logic.Contracts.IIdentifiable
 }
 ```
 
-### Erstellen der Controller-Klassen
+## Erstellen der ViewModels
 
-Die Kontroller-Klassen nehmen eine zentrale Rolle innerhalb des **MVC-(Model-View-Controller)** Musters ein. Sie sind für die Verarbeitung von HTTP-Anfragen verantwortlich und steuern die Interaktion zwischen dem Client und der Geschäftslogik der Anwendung.
+In Avalonia sind ViewModels ein zentraler Bestandteil des MVVM (Model-View-ViewModel)-Patterns. Sie dienen als Vermittler zwischen der UI (View) und der Geschäftslogik (Model).
 
-**Aufgaben der Kontroller-Klassen:**
+Hauptaufgaben eines ViewModels in Avalonia:
 
-1. **Annahme und Verarbeitung von HTTP-Anfragen**
+- Datenbereitstellung: Das ViewModel stellt der View über Bindings (Binding-Mechanismus) Daten zur Verfügung.
+- Befehlssteuerung: Es implementiert Commands (ICommand), um Benutzerinteraktionen zu verarbeiten.
+- Benachrichtigungen: Änderungen an Eigenschaften werden durch das Interface INotifyPropertyChanged an die View weitergeleitet.
+- Trennung von UI und Logik: Das ViewModel enthält keine direkte UI-Logik, sondern hält die Anwendung testbar und modular.
 
-- Ein Controller empfängt HTTP-Anfragen (z. B. GET, POST, PUT, DELETE).
-- Er analysiert die übermittelten Parameter und leitet sie an die entsprechenden Methoden weiter.
+### Erstellung des ViewModels `CompaniesViewModel`
 
-2. **Auswahl und Aufruf der Geschäftslogik**
+Im ersten Schritt wird das **ViewModel** erstellt. Das bietet den Vorteil, dass bei der Erstellung der **View** das **ViewModel** gleich gebunden werden kann und die Entwicklung der Ansicht wesentlich vereinfacht wird.
 
-- Er ruft Services oder Repositories auf, um Daten zu verarbeiten oder aus der Datenbank abzurufen.
-- Die Trennung zwischen Controller und Geschäftslogik wird durch Dependency Injection (DI) ermöglicht.
-
-3. **Verarbeitung und Validierung von Eingaben**
-
-- Ein Controller validiert die eingehenden Daten mithilfe von Modellvalidierung ([Required], [Range], [StringLength] usw.).
-- Falls die Validierung fehlschlägt, gibt er eine entsprechende Fehlermeldung zurück (400 Bad Request).
-
-4. **Erstellung von HTTP-Antworten**
-
-- Er generiert und sendet Antworten an den Client in Form von JSON oder XML.
-- Er setzt den passenden HTTP-Statuscode (200 OK, 201 Created, 404 Not Found, 500 Internal Server Error etc.).
-
-5. **Routing und Endpunktverwaltung**
-
-- Durch Attribute wie [Route] oder [HttpGet] werden Endpunkte definiert, die die Client-Anfragen steuern.
-
-**Wichtige Aspekte eines Controllers:**
-
-| Aspekt | Beschreibung |
-|--------|--------------|
-| `ApiController` | Markiert die Klasse als Web-API-Controller. |
-| `ProductsController` | Der Name der konkrete Klasse muss mit dem Postfix `Controller` enden. | 
-| Route("api/products")	| Definiert die Basis-URL für die API. |
-| HttpGet, HttpPost	| Spezifiziert, welche HTTP-Methoden unterstützt werden. |
-| Ok(), NotFound(), BadRequest() | Erzeugt standardisierte HTTP-Antworten. |
-| CreatedAtAction()	| Gibt eine 201 Created-Antwort mit einer neuen Ressource zurück. |
-
-Im folgenden wird die Kontroller-Klasse `CompaniesController` beispielhaft für alle anderen Entitäten implementiert:
+Das `CompaniesViewModel` beinhaltet die Auflistung der `Company`-Einträge, den Filter und die Bearbeitungsoperationen wie Erstellen, Bearbeiten und Löschen.
 
 ```csharp
-namespace CompanyManager.WebApi.Controllers
+namespace CompanyManager.RestMVVMApp.ViewModels
 {
-    using TModel = Models.Company;
-    using TEntity = Logic.Entities.Company;
-    using TContract = Common.Contracts.ICompany;
-
-    /// <summary>
-    /// Controller for managing companies.
-    /// </summary>
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CompaniesController : ControllerBase
+    public partial class CompaniesViewModel : ViewModelBase
     {
-        private const int MaxCount = 500;
+        #region fields
+        private string _filter = string.Empty;
+        private readonly List<Models.Company> _companies = [];
+        #endregion fields
 
-        /// <summary>
-        /// Gets the context for the database operations.
-        /// </summary>
-        /// <returns>The database context.</returns>
-        protected Logic.Contracts.IContext GetContext()
+        public RelayCommand LoadCompaniesCommand { get; }
+        public string Filter
         {
-            return Logic.DataContext.Factory.CreateContext();
-        }
-
-        /// <summary>
-        /// Gets the DbSet for the company entity.
-        /// </summary>
-        /// <param name="context">The database context.</param>
-        /// <returns>The DbSet for the company entity.</returns>
-        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
-        {
-            return context.CompanySet;
-        }
-
-        /// <summary>
-        /// Converts a company entity to a company model.
-        /// </summary>
-        /// <param name="entity">The company entity.</param>
-        /// <returns>The company model.</returns>
-        protected virtual TModel ToModel(TEntity entity)
-        {
-            var result = new TModel();
-
-            (result as TContract).CopyProperties(entity);
-            if (entity.Customers != null)
+            get
             {
-                result.Customers = [.. entity.Customers.Select(e => 
+                return _filter;
+            }
+            set
+            {
+                _filter = value;
+                ApplyFilter(value);
+                OnPropertyChanged();
+            }
+        }
+        public ObservableCollection<Models.Company> Companies { get; } = [];
+
+        public CompaniesViewModel()
+        {
+            LoadCompaniesCommand = new RelayCommand(async () => await LoadCompaniesAsync());
+
+            PropertyChanged += (o, e) =>
+            {
+                if (e.PropertyName == nameof(Filter))
                 {
-                    var result = new Models.Customer();
-
-                    (result as Common.Contracts.ICustomer).CopyProperties(e);
-                    return result;
-                })];
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Converts a company model to a company entity.
-        /// </summary>
-        /// <param name="model">The company model.</param>
-        /// <param name="entity">The existing company entity, or null to create a new entity.</param>
-        /// <returns>The company entity.</returns>
-        protected virtual TEntity ToEntity(TModel model, TEntity? entity)
-        {
-            TEntity result = entity ?? new TEntity();
-
-            (result as TContract).CopyProperties(model);
-            return result;
-        }
-
-        /// <summary>
-        /// Gets a list of companies.
-        /// </summary>
-        /// <returns>A list of company models.</returns>
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<TModel>> Get()
-        {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
-            var querySet = dbSet.AsQueryable().AsNoTracking();
-            var query = querySet.Take(MaxCount).ToArray();
-            var result = query.Select(e => ToModel(e));
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Queries companies based on a predicate.
-        /// </summary>
-        /// <param name="predicate">The query predicate.</param>
-        /// <returns>A list of company models that match the predicate.</returns>
-        [HttpGet("/api/[controller]/query/{predicate}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<TModel>> Query(string predicate)
-        {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
-            var querySet = dbSet.AsQueryable().AsNoTracking();
-            var query = querySet.Where(HttpUtility.UrlDecode(predicate)).Take(MaxCount).ToArray();
-            var result = query.Select(e => ToModel(e));
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Gets a company by its ID.
-        /// </summary>
-        /// <param name="id">The company ID.</param>
-        /// <returns>The company model.</returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<TModel?> Get(int id)
-        {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
-            var result = dbSet.Include(e => e.Customers).FirstOrDefault(e => e.Id == id);
-
-            return result == null ? NotFound() : Ok(ToModel(result));
-        }
-
-        /// <summary>
-        /// Creates a new company.
-        /// </summary>
-        /// <param name="model">The company model.</param>
-        /// <returns>The created company model.</returns>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Post([FromBody] TModel model)
-        {
-            try
-            {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
-                var entity = ToEntity(model, null);
-
-                (entity as TContract).CopyProperties(model);
-                dbSet.Add(entity);
-                context.SaveChanges();
-
-                return CreatedAtAction("Get", new { id = entity.Id }, entity);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Updates an existing company.
-        /// </summary>
-        /// <param name="id">The company ID.</param>
-        /// <param name="model">The company model.</param>
-        /// <returns>The updated company model.</returns>
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Put(int id, [FromBody] TModel model)
-        {
-            try
-            {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
-                var entity = dbSet.FirstOrDefault(e => e.Id == id);
-
-                if (entity != null)
-                {
-                    model.Id = id;
-                    entity = ToEntity(model, entity);
-                    context.SaveChanges();
+                    LoadCompaniesCommand.NotifyCanExecuteChanged();
                 }
-                return entity == null ? NotFound() : Ok(ToModel(entity));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+            };
 
-        /// <summary>
-        /// Partially updates an existing company.
-        /// </summary>
-        /// <param name="id">The company ID.</param>
-        /// <param name="patchModel">The JSON patch document.</param>
-        /// <returns>The updated company model.</returns>
-        [HttpPatch("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Patch(int id, [FromBody] JsonPatchDocument<TModel> patchModel)
+            _ = LoadCompaniesAsync();
+        }
+        private async Task LoadCompaniesAsync()
         {
             try
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
-                var entity = dbSet.FirstOrDefault(e => e.Id == id);
+                using var httpClient = new HttpClient { BaseAddress = new Uri(API_BASE_URL) };
+                var response = await httpClient.GetStringAsync("companies");
+                var companies = JsonSerializer.Deserialize<List<Models.Company>>(response, _jsonSerializerOptions);
 
-                if (entity != null)
+                if (companies != null)
                 {
-                    var model = ToModel(entity);
-
-                    patchModel.ApplyTo(model);
-
-                    (entity as TContract).CopyProperties(model);
-                    context.SaveChanges();
+                    _companies.Clear();
+                    foreach (var company in companies)
+                    {
+                        _companies.Add(company);
+                    }
+                    ApplyFilter(Filter);
                 }
-                return entity == null ? NotFound() : Ok(ToModel(entity));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Console.WriteLine($"Error loading companies: {ex.Message}");
             }
         }
-
-        /// <summary>
-        /// Deletes a company by its ID.
-        /// </summary>
-        /// <param name="id">The company ID.</param>
-        /// <returns>No content if the deletion was successful.</returns>
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Delete(int id)
+        private async void ApplyFilter(string filter)
         {
-            try
+            // UI-Update sicherstellen
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
-                var entity = dbSet.FirstOrDefault(e => e.Id == id);
-
-                if (entity != null)
+                Companies.Clear();
+                foreach (var company in _companies)
                 {
-                    dbSet.Remove(entity);
-                    context.SaveChanges();
+                    if (company.ToString().Contains(filter, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Companies.Add(company);
+                    }
                 }
-                return entity == null ? NotFound() : NoContent();
-            }
-            catch (Exception ex)
+            });
+        }
+        [RelayCommand]
+        public async Task ExecuteAddCommand()
+        {
+            var companyWindow = new CompanyWindow();
+            var viewModel = new CompanyViewModel { CloseAction = companyWindow.Close };
+            companyWindow.DataContext = viewModel;
+            // Aktuelles Hauptfenster als Parent setzen
+            var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+            if (mainWindow != null)
             {
-                return BadRequest(ex.Message);
+                companyWindow.Closed += (s, e) => _ = LoadCompaniesAsync();
+                await companyWindow.ShowDialog(mainWindow);
+            }
+        }
+        [RelayCommand]
+        public async Task ExecuteEditItemCommand(Models.Company company)
+        {
+            var companyWindow = new CompanyWindow();
+            var viewModel = new CompanyViewModel { Model = company, CloseAction = companyWindow.Close };
+
+            companyWindow.DataContext = viewModel;
+
+            // Aktuelles Hauptfenster als Parent setzen
+            var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+
+            if (mainWindow != null)
+            {
+                companyWindow.Closed += (s, e) => _ = LoadCompaniesAsync();
+                await companyWindow.ShowDialog(mainWindow);
+            }
+        }
+        [RelayCommand]
+        public async Task ExecuteDeleteItemCommand(Models.Company company)
+        {
+            var messageDialog = new MessageDialog("Delete", $"Wollen Sie die Firma '{company.Name}' löschen?", MessageType.Question);
+            // Aktuelles Hauptfenster als Parent setzen
+            var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+
+            await messageDialog.ShowDialog(mainWindow!);
+
+            if (messageDialog.Result == MessageResult.Yes)
+            {
+                using var httpClient = new HttpClient { BaseAddress = new Uri(API_BASE_URL) };
+
+
+                var response = await httpClient.DeleteAsync($"companies/{company.Id}");
+
+                if (response.IsSuccessStatusCode == false)
+                {
+                    messageDialog = new MessageDialog("Error", "Beim Löschen ist ein Fehler aufgetreten!", MessageType.Error);
+                    await messageDialog.ShowDialog(mainWindow!);
+                }
+                else
+                {
+                    _ = LoadCompaniesAsync();
+                }
             }
         }
     }
 }
 ```
 
-Hier ist eine Tabelle, die die wichtigsten HTTP-Methoden (GET, POST, PUT, DELETE, PATCH) in Bezug auf ihre Verwendung in einer Web-API beschreibt:
+#### Erstellung der View  `CompaniesUserControl`
 
-| HTTP-Methode | Beschreibung | Verwendetes Attribut | Statuscodes (Erfolgsfälle) | Beispiel |
-|--------------|--------------|----------------------|----------------------------|----------|
-| **GET** |	Fordert Daten vom Server an (idempotent).| [HttpGet] | 200 OK, 404 Not Found | GET /api/products |
-| **POST** | Erstellt eine neue Ressource auf dem Server. | [HttpPost] | 201 Created, 400 Bad Request |	POST /api/products mit JSON-Body |
-| **PUT** | Aktualisiert eine gesamte Ressource (idempotent). | [HttpPut] |	200 OK, 204 No Content, 400 Bad Request, 404 Not Found | PUT /api/products/1 mit JSON-Body |
-| **PATCH**	| Aktualisiert eine Ressource teilweise. | [HttpPatch] | 200 OK, 204 No Content, 400 Bad Request, 404 Not Found | PATCH /api/products/1 mit JSON-Body |
-| **DELETE** | Löscht eine Ressource vom Server. | [HttpDelete]	| 200 OK, 204 No Content, 404 Not Found	| DELETE /api/products/1 |
-
-Diese Tabelle gibt einen strukturierten Überblick über die verschiedenen Methoden und deren typische Verwendung in einer Web-API.
-
-#### Die Kontroller `CustomersController` und `EmployeesController` können analog zur `CompaniesController` implementiert werden.
-
-Vorgehensweise:
-
-Kopieren Sie die Klasse `CompaniesController` und benennen Sie sie in `CustomersController` um. Ändern Sie die Typen `Company` in `Customer`. Nachfolgend finden Sie die Änderungen, die Sie vornehmen müssen:
-
-```csharp
-namespace CompanyManager.WebApi.Controllers
-{
-    using TModel = Models.Customer;
-    using TEntity = Logic.Entities.Customer;
-    using TContract = Common.Contracts.ICustomer;
-
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CustomersController : ControllerBase
-    {
-        private const int MaxCount = 500;
-
-        protected Logic.Contracts.IContext GetContext()
-        {
-            return Logic.DataContext.Factory.CreateContext();
-        }
-        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
-        {
-            return context.CustomerSet;
-        }
-        ...
-    }
-}
-```
-
-Das gleiche Vorgehen gilt für die Klasse `EmployeesController`. Nachfolgend finden Sie die Änderungen, die Sie vornehmen müssen:
-
-```csharp
-namespace CompanyManager.WebApi.Controllers
-{
-    using TModel = Models.Employee;
-    using TEntity = Logic.Entities.Employee;
-    using TContract = Common.Contracts.IEmployee;
-
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EmployeesController : ControllerBase
-    {
-        private const int MaxCount = 500;
-
-        protected Logic.Contracts.IContext GetContext()
-        {
-            return Logic.DataContext.Factory.CreateContext();
-        }
-        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
-        {
-            return context.EmployeeSet;
-        }
-        protected virtual TModel ToModel(TEntity entity)
-        {
-            var result = new TModel();
-
-            result.CopyProperties(entity);
-            return result;
-        }
-        ...
-    }
-}
-```
+In den meisten Fällen ist es sinnvoll, dass die Ansicht als `UserControl` entwickelt wird. Das hat den Vorteil, dass die Ansicht vielseitig eingesetzt werden kann.
 
 ### Testen des Systems
 

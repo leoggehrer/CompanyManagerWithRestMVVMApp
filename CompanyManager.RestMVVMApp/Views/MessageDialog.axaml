@@ -7,7 +7,7 @@
         x:Class="CompanyManager.RestMVVMApp.Views.MessageDialog"
 		x:DataType="vm:MessageDialogViewModel"
 		WindowStartupLocation="CenterOwner"
-		Width="400" Height="150"
+		Width="600" Height="150"
 		CanResize="False"
         Title="{Binding Title}">
 

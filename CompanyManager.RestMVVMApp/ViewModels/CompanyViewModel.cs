@@ -71,7 +71,7 @@ namespace CompanyManager.RestMVVMApp.ViewModels
                     }
                     else
                     {
-                        var messageDialog = new MessageDialog("Fehler", "Beim Speichern ist ein Fehler aufgetreten", MessageType.Error);
+                        var messageDialog = new MessageDialog("Fehler", "Beim Speichern ist ein Fehler aufgetreten!", MessageType.Error);
                         var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
                         await messageDialog.ShowDialog(mainWindow!);
