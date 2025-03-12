@@ -2,7 +2,6 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
-using CompanyManager.RestMVVMApp.Models;
 using CompanyManager.RestMVVMApp.Views;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace CompanyManager.RestMVVMApp.ViewModels
     {
         #region fields
         private string _filter = string.Empty;
-        private Company? selectedItem;
+        private Models.Company? selectedItem;
         private readonly List<Models.Company> _companies = [];
         #endregion fields
 
@@ -55,7 +54,7 @@ namespace CompanyManager.RestMVVMApp.ViewModels
 
         #region commands
         [RelayCommand]
-        public async Task LoadCompanies()
+        public async Task LoadItems()
         {
             await LoadCompaniesAsync();
         }

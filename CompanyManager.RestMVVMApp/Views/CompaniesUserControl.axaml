@@ -20,49 +20,39 @@
 			<RowDefinition Height="*"></RowDefinition>
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+		<Grid Grid.Column="0" Grid.Row="0" Margin="0 0 0 10">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"></ColumnDefinition>
-				<ColumnDefinition Width="10"></ColumnDefinition>
+				<ColumnDefinition Width="35"></ColumnDefinition>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+				<ColumnDefinition Width="35"></ColumnDefinition>
 			</Grid.ColumnDefinitions>
 
 			<!-- Filter-Textbox nimmt die gesamte verfügbare Breite ein -->
-			<Button
-				Grid.Column="0"
-				Grid.Row="0"
+			<Button Grid.Column="0"	Grid.Row="0"
 				Background="Transparent"
-				Command="{Binding AddItemCommand}"
-				Margin="0 0 0 10">
+				Command="{Binding AddItemCommand}">
 				<StackPanel Orientation="Horizontal" Width="20" Height="20">
 					<Image Source="/Assets/add.png"></Image>
 				</StackPanel>
 			</Button>
 
-			<TextBox 
-				Grid.Column="0" 
-				Grid.Row="0" 
+			<TextBox Grid.Column="1" Grid.Row="0" 
 				Watermark="Geben Sie hier eine Filter ein"
 				Text="{Binding Filter}" 
-				HorizontalAlignment="Stretch" 
-				Margin="40 0 0 10" />
+				HorizontalAlignment="Stretch" />
 
 			<!-- Button mit fester Breite -->
-			<Button
-				Grid.Column="1"
-				Grid.Row="0"
+			<Button	Grid.Column="2"	Grid.Row="0"
 				Background="Transparent"
-				Command="{Binding LoadCompaniesCommand}"
-				Margin="0 0 0 10">
+				Command="{Binding LoadItemsCommand}">
 				<StackPanel Orientation="Horizontal" Width="20" Height="20">
 					<Image Stretch="" Source="/Assets/reload.png"></Image>
 				</StackPanel>
 			</Button>
 		</Grid>
 
-		<DataGrid
+		<DataGrid Grid.Column="0" Grid.Row="1"
 			x:Name="dataGrid"
-			Grid.Column="0"
-			Grid.Row="1"
 			BorderThickness="1"
 			BorderBrush="Gray"
 			IsReadOnly="True"
@@ -99,7 +89,6 @@
 				</DataGridTemplateColumn>
 			</DataGrid.Columns>
 		</DataGrid>
-
 	</Grid>
 
 </UserControl>
